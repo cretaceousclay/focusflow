@@ -82,7 +82,7 @@ function sanitizeTaskSchema(rawTasks) {
 }
 
 async function syncWithCloudSpreadsheet() {
-    if (!SPREADSHEET_API_URL || SPREADSHEET_API_URL.includes("YOUR_COPIED_")) return;
+    if (!SPREADSHEET_API_URL || SPREADSHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbyxGGP_Tx8tKV3t85YElCXdV0MGT3HKJErRhKCjvPvew-QZm7NGRbAUYgWd-RzsXTPmfQ/exec")) return;
     
     try {
         const response = await fetch(SPREADSHEET_API_URL);
