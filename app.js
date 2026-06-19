@@ -1,7 +1,7 @@
 // ==========================================
 // 1. GLOBAL STATE & CONFIGURATION
 // ==========================================
-const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbwk6Cw6ZHSzDKo2r_Pw9AW-zpDHfGeq76w7gjzsUFI2DRoGGfsBz40NQnC0aFiIDI3Uew/exec";
+const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbyxGGP_Tx8tKV3t85YElCXdV0MGT3HKJErRhKCjvPvew-QZm7NGRbAUYgWd-RzsXTPmfQ/exec";
 
 let state = {
     tasks: [],
@@ -109,15 +109,16 @@ function saveToLocalStorage() {
 }
 
 async function pushToCloudSpreadsheet() {
-    if (!SPREADSHEET_API_URL || SPREADSHEET_API_URL.includes("YOUR_COPIED_")) return;
+    if (!SPREADSHEET_API_URL || SPREADSHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbyxGGP_Tx8tKV3t85YElCXdV0MGT3HKJErRhKCjvPvew-QZm7NGRbAUYgWd-RzsXTPmfQ/exec")) return;
     
     try {
+        const payloadBlob = JSON.stringify(state.tasks);
         await fetch(SPREADSHEET_API_URL, {
             method: 'POST',
             mode: 'no-cors', 
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(state.tasks)
         });
+        console.log("Cloud sync stream uploaded securely.");
     } catch (e) {
         console.error("Cloud push failed. Task queued locally until next change: ", e);
     }
