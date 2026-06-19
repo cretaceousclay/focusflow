@@ -735,7 +735,7 @@ body.calendar-dragging * { cursor: ns-resize !important; }
         padding: 16px;
         background-color: #161920;
         border-top: 1px solid #262c3a;
-        padding-bottom: calc(32px + env(safe-area-inset-bottom));
+        padding-bottom: calc(64px + env(safe-area-inset-bottom));
     }
 
     .mobile-dock-slot {
