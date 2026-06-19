@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - ADHD Workspace</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <canvas id="celebration-canvas"></canvas>
+
+    <header class="app-tabs">
+        <div class="tabs-left-group">
+            <button class="tab-btn active" data-tab="current">Current Focus</button>
+            <button class="tab-btn" data-tab="short">Short Term</button>
+            <button class="tab-btn" data-tab="medium">Medium Term</button>
+            <button class="tab-btn" data-tab="long">Long Term</button>
+            <button class="tab-btn" data-tab="master">Master Archive</button>
+        </div>
+        <button class="btn btn-add" id="open-add-modal">+ Add Task</button>
+    </header>
+
+    <main class="app-container" id="app-workspace-layout">
+        
+        <section class="main-content" id="main-content-area"></section>
+
+        <aside class="sidebar-panel collapsed" id="sidebar-queue-panel">
+            <div class="sidebar-header">
+                <button type="button" class="queue-square-toggle" id="queue-toggle-square" title="Toggle Sidebar"></button>
+                <h3 class="sidebar-header-title">Today's Queue</h3>
+            </div>
+            <div class="queue-list-container">
+                <div class="queue-items" id="queue-items-wrapper"></div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- RESIZABLE RUNNING CALENDAR FOOTER -->
+    <footer class="week-calendar" id="calendar-footer">
+        <div class="calendar-resize-handle" id="calendar-resizer"></div>
+        <div class="calendar-controls">
+            <div class="nav-arrows">
+                <button type="button" class="btn btn-nav" id="cal-prev-week" title="Previous Week">←</button>
+                <button type="button" class="btn btn-nav" id="cal-today" title="Current Week">Today</button>
+                <button type="button" class="btn btn-nav" id="cal-next-week" title="Next Week">→</button>
+            </div>
+            <button type="button" class="btn btn-nav" id="toggle-full-calendar">Full Month View</button>
+        </div>
+        <div class="calendar-grid-wrapper" id="calendar-grid-container"></div>
+    </footer>
+
+    <div class="modal-overlay" id="add-task-modal">
+        <div class="modal-content">
+            <h3>Create New Task</h3>
+            <form id="task-form">
+                <input type="text" placeholder="What needs to be done?" required class="input-main" id="task-title-input">
+                <div class="form-row">
+                    <label>Horizons:
+                        <select id="task-term">
+                            <option value="short" selected>Short Term</option>
+                            <option value="medium">Medium Term</option>
+                            <option value="long">Long Term</option>
+                        </select>
+                    </label>
+                    <label>Priority Color:
+                        <select id="task-priority">
+                            <option value="low" selected>Blue (Low)</option>
+                            <option value="medium">Yellow (Medium)</option>
+                            <option value="high">Red (High)</option>
+                        </select>
+                    </label>
+                    <label>Target Date:
+                        <input type="date" id="task-date"> 
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-complete">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="edit-task-modal">
+        <div class="modal-content edit-modal-expanded">
+            <h3>Edit Task Configuration</h3>
+            <div class="form-row">
+                <label>Task Title Description:
+                    <input type="text" id="edit-global-title" class="input-main">
+                </label>
+            </div>
+            <div class="form-row">
+                <label>Horizons:
+                    <select id="edit-global-term">
+                        <option value="short">Short Term</option>
+                        <option value="medium">Medium Term</option>
+                        <option value="long">Long Term</option>
+                    </select>
+                </label>
+                <label>Priority:
+                    <select id="edit-global-priority">
+                        <option value="low">Blue (Low)</option>
+                        <option value="medium">Yellow (Medium)</option>
+                        <option value="high">Red (High)</option>
+                    </select>
+                </label>
+                <label>Target Date:
+                    <input type="date" id="edit-global-date">
+                </label>
+            </div>
+            <!-- TASK NOTES DESCRIPTIONS EXPANSION -->
+            <div class="form-row">
+                <label>Task Descriptions & Notes:
+                    <textarea id="edit-global-notes" class="input-main textarea-notes" placeholder="Brain dump your tactical thoughts or description benchmarks here..."></textarea>
+                </label>
+            </div>
+            <div class="focus-subtasks">
+                <span class="focus-label">Task Breakdown (Up to 3 Levels Depth)</span>
+                <div id="edit-modal-subtasks-tree"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-complete" id="edit-global-complete-btn">Complete Task</button>
+                <button type="button" class="btn btn-duplicate" id="edit-global-duplicate-btn">Duplicate</button>
+                <button type="button" class="btn btn-delete" id="edit-global-delete-btn" style="margin-right: auto;">Delete</button>
+                <button type="button" class="btn btn-postpone" id="close-edit-modal">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <!-- FULL EXPANSION MONTHLY VIEW OVERLAY LAYOUT -->
+    <div class="full-month-overlay" id="full-month-viewport">
+        <header class="month-overlay-header">
+            <div class="month-title-group">
+                <button type="button" class="btn btn-nav" id="month-prev">←</button>
+                <h2 id="month-display-label">June 2026</h2>
+                <button type="button" class="btn btn-nav" id="month-next">→</button>
+            </div>
+            <button type="button" class="btn" id="close-full-calendar">Exit Calendar View</button>
+        </header>
+        <div class="month-grid-days-header">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+        <div class="month-grid-matrix" id="month-matrix-container"></div>
+    </div>
+
+    <div class="modal-overlay" id="timeline-scheduler-modal">
+        <div class="modal-content timeline-modal-container">
+            <header class="timeline-modal-header">
+                <h2 id="timeline-date-label">Schedule Matrix: June 18, 2026</h2>
+                <button type="button" class="btn" id="close-timeline-modal">Minimize Planner</button>
+            </header>
+            
+            <div class="timeline-workspace-body">
+                <div class="timeline-scroll-axis">
+                    <div class="timeline-grid-matrix" id="hourly-slots-matrix"></div>
+                </div>
+                
+                <div class="timeline-task-sidebar">
+                    <h3>Day Agenda Items</h3>
+                    <p class="context-tip">Drag items into time slots to schedule alarms.</p>
+                    <ul class="timeline-sidebar-task-list" id="timeline-sidebar-tasks"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-workspace-layout">
+        <header class="mobile-action-bar">
+            <button type="button" class="btn btn-delete" id="mob-action-delete">Delete</button>
+            <button type="button" class="btn btn-add" id="mob-action-add">+ Add</button>
+            <button type="button" class="btn btn-complete" id="mob-action-complete">Complete</button>
+        </header>
+        <main class="mobile-focus-stage" id="mobile-focus-card-dest"></main>
+        <footer class="mobile-queue-dock">
+            <div class="mobile-dock-slot" id="mob-slot-1" data-queue-index="1"></div>
+            <div class="mobile-dock-slot" id="mob-slot-2" data-queue-index="2"></div>
+            <div class="mobile-dock-slot" id="mob-slot-3" data-queue-index="3"></div>
+        </footer>
+    </div>
+
+    <div id="mobile-add-overlay">
+        <header class="mobile-overlay-header">
+            <h2>New Queue Item</h2>
+            <button type="button" class="btn" id="mob-cancel-add">Cancel</button>
+        </header>
+        <form id="mobile-task-form">
+            <div class="form-group">
+                <label>Task Title</label>
+                <input type="text" id="mob-input-title" required placeholder="What are we doing next?">
+            </div>
+            <div class="form-group">
+                <label>Priority Tier</label>
+                <select id="mob-input-priority">
+                    <option value="low">Blue (Low)</option>
+                    <option value="medium">Yellow (Medium)</option>
+                    <option value="high" selected>Red (High)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Horizon Term</label>
+                <select id="mob-input-term">
+                    <option value="short" selected>Short Term</option>
+                    <option value="medium">Medium Term</option>
+                    <option value="long">Long Term</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-complete submit-mob-btn">Push to Top of Queue</button>
+        </form>
+    </div>
+</body>
+</html>
